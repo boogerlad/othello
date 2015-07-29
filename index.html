@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="a.css">
 	</head>
 	<body bgcolor="#E6E6FA">
-		<table id="board" cellpadding="0" cellspacing="0">
+		<table cellpadding="0" cellspacing="0">
 			<tr>
 				<td id="A8"></td>
 				<td id="B8"></td>
@@ -41,9 +41,9 @@
 			<tr>
 				<td id="A5"></td>
 				<td id="B5"></td>
-				<td id="C5"><span class="possible"></span></td>
-				<td id="D5"><span class="player one"></span></td>
-				<td id="E5"><span class="player two"></span></td>
+				<td id="C5" class="possible"></td>
+				<td id="D5" class="one"></td>
+				<td id="E5" class="two"></td>
 				<td id="F5"></td>
 				<td id="G5"></td>
 				<td id="H5"></td>
@@ -52,8 +52,8 @@
 				<td id="A4"></td>
 				<td id="B4"></td>
 				<td id="C4"></td>
-				<td id="D4"><span class="player two"></span></td>
-				<td id="E4"><span class="player one"></span></td>
+				<td id="D4" class="two"></td>
+				<td id="E4" class="one"></td>
 				<td id="F4"></td>
 				<td id="G4"></td>
 				<td id="H4"></td>
@@ -90,6 +90,7 @@
 			</tr>
 		</table>
 		<label><input type="checkbox" id="visibleMoves" checked>Show possible moves</label>
+		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script src="a.js"></script>
 	</body>
 </html>

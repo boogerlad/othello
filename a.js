@@ -1,56 +1,46 @@
 document.getElementById('visibleMoves').onchange = function()
 {
+	var exes = document.getElementsByClassName('possible');
 	if(this.checked)
 	{
-		$(".possible").each
-		(
-			function()
-			{
-				$(this).css('background-image', "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><line x1='1' y1='1' x2='9' y2='9' stroke='red'/><line x1='1' y1='9' x2='9' y2='1' stroke='red'/></svg>\")");
-			}
-		);
+		for(var i = 0; i < exes.length; ++i)
+		{
+			exes[i].style.backgroundImage = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><line x1='1' y1='1' x2='9' y2='9' stroke='red'/><line x1='1' y1='9' x2='9' y2='1' stroke='red'/></svg>\")";
+		}
 	}
 	else
 	{
-		$(".possible").each
-		(
-			function()
-			{
-				$(this).css('background-image', "none");
-			}
-		);
+		for(var i = 0; i < exes.length; ++i)
+		{
+			exes[i].style.backgroundImage = "none";
+		}
 	}
 };
 
 function htmlToArray()
 {
 	var boardArray = [];
-	$('table tr').each
-	(
-		function()
+	var rows = document.getElementsByTagName('tr');
+	for(var i = 0; i < rows.length; ++i)
+	{
+		var row = [];
+		for(var j = 0; j < rows[i].children.length; ++j)
 		{
-			var row = [];
-			$(this).children().each
-			(
-				function()
-				{
-					if(this.className === 'one')
-					{
-						row.push(true);
-					}
-					else if(this.className === 'two')
-					{
-						row.push(false);
-					}
-					else if(this.className === '')
-					{
-						row.push(null);
-					}
-				}
-			);
-			boardArray.push(row);
+			if(rows[i].children[j].className === 'one')
+			{
+				row.push(true);
+			}
+			else if(rows[i].children[j].className === 'two')
+			{
+				row.push(false);
+			}
+			else if(rows[i].children[j].className === '')
+			{
+				row.push(null);
+			}
 		}
-	);
+		boardArray.push(row);
+	}
 	return boardArray;
 }
 
@@ -69,56 +59,56 @@ function calculatePossibilities(player)
 				var bigJ = j + 1 < board[i].length;
 				if(bigJ && board[i][j + 1] === !player)//if player is true, explicitly check for false, rather than checking for not true which can mean false or null(empty) and give false possibilities
 				{
-					if(a = continueSearch(board, i, j + 1, player, 0, 1))
+					if(a = continueSearch(board, [[i, j + 1]], player, 0, 1))
 					{
 						possibilities.push(a);//I could modify the dom here...
 					}
 				}
 				if(j && board[i][j - 1] === !player)
 				{
-					if(a = continueSearch(board, i, j - 1, player, 0, -1))
+					if(a = continueSearch(board, [[i, j - 1]], player, 0, -1))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(i && j && board[i - 1][j - 1] === !player)
-				{
-					if(a = continueSearch(board, i - 1, j - 1, player, -1, -1))
+				{//we've already checked if this position has a piece that is opposite of the player's color, so we should keep it in array
+					if(a = continueSearch(board, [[i - 1, j - 1]], player, -1, -1))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(i && board[i - 1][j] === !player)
 				{
-					if(a = continueSearch(board, i - 1, j, player, -1, 0))
+					if(a = continueSearch(board, [[i - 1, j]], player, -1, 0))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(i && bigJ && board[i - 1][j + 1] === !player)
 				{
-					if(a = continueSearch(board, i - 1, j + 1, player, -1, 1))
+					if(a = continueSearch(board, [[i - 1, j + 1]], player, -1, 1))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(bigI && j && board[i + 1][j - 1] === !player)
 				{
-					if(a = continueSearch(board, i + 1, j - 1, player, 1, -1))
+					if(a = continueSearch(board, [[i + 1, j - 1]], player, 1, -1))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(bigI && board[i + 1][j] === !player)
 				{
-					if(a = continueSearch(board, i + 1, j, player, 1, 0))
+					if(a = continueSearch(board, [[i + 1, j]], player, 1, 0))
 					{
 						possibilities.push(a);
 					}
 				}
 				if(bigI && bigJ && board[i + 1][j + 1] === !player)
 				{
-					if(a = continueSearch(board, i + 1, j + 1, player, 1, 1))
+					if(a = continueSearch(board, [[i + 1, j + 1]], player, 1, 1))
 					{
 						possibilities.push(a);
 					}
@@ -126,41 +116,84 @@ function calculatePossibilities(player)
 			}
 		}
 	}
-	draw(possibilities);
+	//console.log(possibilities)
+	draw(possibilities, 'possible');
 	return possibilities;
 }
 
-function continueSearch(board, i, j, player, vecX, vecY)
+function continueSearch(board, history, player, vecX, vecY)
 {
-	if(board[i + vecX][j + vecY] === player)
+	if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === player)
 	{
 		return false;
 	}
-	else if(board[i + vecX][j + vecY] === null)
+	else
 	{
-		return [i + vecX, j + vecY];
-	}
-	else if(board[i + vecX][j + vecY] === !player)
-	{
-		return continueSearch(board, i + vecX, j + vecY, player, vecX, vecY);
+		history.push([history[history.length - 1][0] + vecX, history[history.length - 1][1] + vecY]);
+		if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === null)
+		{
+			return history;
+		}
+		else if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === !player)
+		{
+			return continueSearch(board, history, player, vecX, vecY);
+		}
 	}
 }
 
-function draw(possibilities)
+var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+function draw(stuff, what)
 {
-	var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-	for(var i = 0; i < possibilities.length; ++i)
+	for(var i = 0; i < stuff.length; ++i)
 	{
-		$('#' + letters[possibilities[i][0]] + (possibilities[i][1] + 1)).attr('class', 'possible');
+		document.getElementById(letters[stuff[i][stuff[i].length - 1][0]] + (stuff[i][stuff[i].length - 1][1] + 1)).className = what;
 	}
 }
 
-calculatePossibilities(true);
+function flip(bird)
+{
 
-$(".possible").click
-(
-	function()
+}
+
+function player2class(player)
+{
+	if(player)
 	{
-		//
+		return 'one';
 	}
+	else
+	{
+		return 'two';
+	}
+}
+
+var player = true;
+
+document.addEventListener
+(
+	'click',
+	function(e)
+	{
+		if(e.target.className === 'possible')
+		{
+			alert('bu');
+		}
+	},
+	false
 );
+
+calculatePossibilities(player);
+
+// $(".possible").click
+// (
+// 	function()
+// 	{
+// 		this.className = player2class(player);
+// 		flip(this.id);
+// 		//clear all possibles
+// 		//flip until hit origin
+// 		//change player
+// 		//calculatePossibilities
+// 	}
+// );

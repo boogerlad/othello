@@ -1,19 +1,38 @@
-document.getElementById('visibleMoves').onchange = function()
+//j column
+var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
+var player = false;
+var numberOfMoves = [calculatePossibilities(player), 0];
+
+function mergePossibilities(one, two)
 {
-	var exes = document.getElementsByClassName('possible');
-	if(this.checked)
+	if(one === null || typeof one === 'undefined')
 	{
-		for(var i = 0; i < exes.length; ++i)
-		{
-			exes[i].style.backgroundImage = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><line x1='1' y1='1' x2='9' y2='9' stroke='red'/><line x1='1' y1='9' x2='9' y2='1' stroke='red'/></svg>\")";
-		}
+		return two;
 	}
 	else
 	{
-		for(var i = 0; i < exes.length; ++i)
+		var combined = [];
+		for(var i = 0; i < one.length - 1; ++i)
 		{
-			exes[i].style.backgroundImage = "none";
+			combined.push(one[i]);
 		}
+		for(var i = 0; i < two.length; ++i)
+		{
+			combined.push(two[i]);
+		}
+		return combined;
+	}
+}
+
+document.getElementById('visibleMoves').onchange = function()
+{
+	if(this.checked)
+	{
+		document.styleSheets[0].cssRules[3].style.backgroundImage = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><line x1='1' y1='1' x2='9' y2='9' stroke='red'/><line x1='1' y1='9' x2='9' y2='1' stroke='red'/></svg>\")";
+	}
+	else
+	{
+		document.styleSheets[0].cssRules[3].style.backgroundImage = 'none';
 	}
 };
 
@@ -26,13 +45,14 @@ function htmlToArray()
 		var row = [];
 		for(var j = 0; j < rows[i].children.length; ++j)
 		{
+			//console.log(rows[i].children[j].id)
 			if(rows[i].children[j].className === 'one')
 			{
-				row.push(true);
+				row.push(false);
 			}
 			else if(rows[i].children[j].className === 'two')
 			{
-				row.push(false);
+				row.push(true);
 			}
 			else if(rows[i].children[j].className === '')
 			{
@@ -47,7 +67,8 @@ function htmlToArray()
 function calculatePossibilities(player)
 {
 	var board = htmlToArray();
-	var possibilities = [];
+	var numMoves = 0;
+	var moves = [];
 	for(var i = 0; i < board.length; ++i)
 	{
 		for(var j = 0; j < board[i].length; ++j)
@@ -61,114 +82,130 @@ function calculatePossibilities(player)
 				{
 					if(a = continueSearch(board, [[i, j + 1]], player, 0, 1))
 					{
-						possibilities.push(a);//I could modify the dom here...
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(j && board[i][j - 1] === !player)
 				{
 					if(a = continueSearch(board, [[i, j - 1]], player, 0, -1))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(i && j && board[i - 1][j - 1] === !player)
 				{//we've already checked if this position has a piece that is opposite of the player's color, so we should keep it in array
 					if(a = continueSearch(board, [[i - 1, j - 1]], player, -1, -1))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(i && board[i - 1][j] === !player)
 				{
 					if(a = continueSearch(board, [[i - 1, j]], player, -1, 0))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(i && bigJ && board[i - 1][j + 1] === !player)
 				{
 					if(a = continueSearch(board, [[i - 1, j + 1]], player, -1, 1))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(bigI && j && board[i + 1][j - 1] === !player)
 				{
 					if(a = continueSearch(board, [[i + 1, j - 1]], player, 1, -1))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(bigI && board[i + 1][j] === !player)
 				{
 					if(a = continueSearch(board, [[i + 1, j]], player, 1, 0))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 				if(bigI && bigJ && board[i + 1][j + 1] === !player)
 				{
 					if(a = continueSearch(board, [[i + 1, j + 1]], player, 1, 1))
 					{
-						possibilities.push(a);
+						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+						ex.className = 'possible';
+						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+						++numMoves;
+						moves.push(a);
 					}
 				}
 			}
 		}
 	}
-	//console.log(possibilities)
-	draw(possibilities, 'possible');
-	return possibilities;
+	//console.log(moves)
+	return numMoves;
 }
 
 function continueSearch(board, history, player, vecX, vecY)
 {
-	if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === player)
+	var i = history[history.length - 1][0] + vecX;
+	var j = history[history.length - 1][1] + vecY;
+	if(i < 0 || i > board.length - 1 || j < 0 || j > board[i].length - 1 || board[i][j] === player)
 	{
 		return false;
 	}
 	else
 	{
-		history.push([history[history.length - 1][0] + vecX, history[history.length - 1][1] + vecY]);
-		if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === null)
+		history.push([i, j]);
+		if(board[i][j] === null)
 		{
 			return history;
 		}
-		else if(board[history[history.length - 1][0] + vecX][history[history.length - 1][1] + vecY] === !player)
+		else if(board[i][j] === !player)
 		{
 			return continueSearch(board, history, player, vecX, vecY);
 		}
 	}
 }
 
-var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-
-function draw(stuff, what)
-{
-	for(var i = 0; i < stuff.length; ++i)
-	{
-		document.getElementById(letters[stuff[i][stuff[i].length - 1][0]] + (stuff[i][stuff[i].length - 1][1] + 1)).className = what;
-	}
-}
-
-function flip(bird)
-{
-
-}
-
 function player2class(player)
 {
 	if(player)
 	{
-		return 'one';
+		return 'two';
 	}
 	else
 	{
-		return 'two';
+		return 'one';
 	}
 }
-
-var player = true;
 
 document.addEventListener
 (
@@ -177,23 +214,28 @@ document.addEventListener
 	{
 		if(e.target.className === 'possible')
 		{
-			alert('bu');
+			console.log(player2class(player))
+			console.log(numberOfMoves[player === true ? 1 : 0])
+			var possibilities = JSON.parse(e.target.getAttribute('data-history'));
+			e.target.removeAttribute('data-history');
+			e.target.removeAttribute('class');
+			for(var i = 0; i < possibilities.length; ++i)
+			{
+				document.getElementById(letters[possibilities[i][0]] + (possibilities[i][1] + 1)).className = player2class(player);
+			}
+			var exes = document.getElementsByClassName('possible');
+			for(var i = exes.length - 1; i >= 0; --i)
+			{
+				exes[i].removeAttribute('data-history');
+				exes[i].removeAttribute('class');
+			}
+			player = !player;
+			numberOfMoves[player === true ? 1 : 0] = calculatePossibilities(player);
+			if(numberOfMoves[0] + numberOfMoves[1] === 0)
+			{
+				alert('game over\nblack: ' + document.getElementsByClassName('one').length + '\nwhite: ' + document.getElementsByClassName('two').length);
+			}
 		}
 	},
 	false
 );
-
-calculatePossibilities(player);
-
-// $(".possible").click
-// (
-// 	function()
-// 	{
-// 		this.className = player2class(player);
-// 		flip(this.id);
-// 		//clear all possibles
-// 		//flip until hit origin
-// 		//change player
-// 		//calculatePossibilities
-// 	}
-// );

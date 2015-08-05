@@ -215,7 +215,7 @@ document.addEventListener
 		if(e.target.className === 'possible')
 		{
 			console.log(player2class(player))
-			console.log(numberOfMoves[player === true ? 1 : 0])
+			console.log(numberOfMoves)
 			var possibilities = JSON.parse(e.target.getAttribute('data-history'));
 			e.target.removeAttribute('data-history');
 			e.target.removeAttribute('class');
@@ -231,6 +231,13 @@ document.addEventListener
 			}
 			player = !player;
 			numberOfMoves[player === true ? 1 : 0] = calculatePossibilities(player);
+			console.log(numberOfMoves[player])
+			if(numberOfMoves[player === true ? 1 : 0] === 0)
+			{
+				alert('coolo');
+				player = !player;
+				numberOfMoves[player === true ? 1 : 0] = calculatePossibilities(player);
+			}
 			if(numberOfMoves[0] + numberOfMoves[1] === 0)
 			{
 				alert('game over\nblack: ' + document.getElementsByClassName('one').length + '\nwhite: ' + document.getElementsByClassName('two').length);

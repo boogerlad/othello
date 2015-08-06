@@ -246,3 +246,8 @@ document.addEventListener
 	},
 	false
 );
+
+
+
+var channel = new DataChannel('green tea parfait');
+channel.send('pocky');

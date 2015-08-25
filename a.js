@@ -1,7 +1,7 @@
 //j column
 var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
+var mode = false; //local
 var player = false;
-var numberOfMoves = [calculatePossibilities(player), 0];
 
 function mergePossibilities(one, two)
 {
@@ -39,22 +39,21 @@ document.getElementById('visibleMoves').onchange = function()
 function htmlToArray()
 {
 	var boardArray = [];
-	var rows = document.getElementsByTagName('tr');
+	var rows = document.getElementById('bored').rows;
 	for(var i = 0; i < rows.length; ++i)
 	{
 		var row = [];
-		for(var j = 0; j < rows[i].children.length; ++j)
+		for(var j = 0; j < rows[i].cells.length; ++j)
 		{
-			//console.log(rows[i].children[j].id)
-			if(rows[i].children[j].className === 'one')
+			if(rows[i].cells[j].className === 'one')
 			{
 				row.push(false);
 			}
-			else if(rows[i].children[j].className === 'two')
+			else if(rows[i].cells[j].className === 'two')
 			{
 				row.push(true);
 			}
-			else if(rows[i].children[j].className === '')
+			else if(rows[i].cells[j].className === '')
 			{
 				row.push(null);
 			}
@@ -66,110 +65,61 @@ function htmlToArray()
 
 function calculatePossibilities(player)
 {
+	function plotPossibility(a)
+	{
+		if(a)
+		{
+			var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
+			ex.className = 'possible';
+			ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
+			++numMoves;
+		}
+	}
 	var board = htmlToArray();
 	var numMoves = 0;
-	var moves = [];
 	for(var i = 0; i < board.length; ++i)
 	{
 		for(var j = 0; j < board[i].length; ++j)
 		{
 			if(board[i][j] === player)
 			{
-				var a;
 				var bigI = i + 1 < board.length;
 				var bigJ = j + 1 < board[i].length;
 				if(bigJ && board[i][j + 1] === !player)//if player is true, explicitly check for false, rather than checking for not true which can mean false or null(empty) and give false possibilities
-				{
-					if(a = continueSearch(board, [[i, j + 1]], player, 0, 1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+				{//we've already checked if this position has a piece that is opposite of the player's color, so we should keep it in array
+					plotPossibility(continueSearch(board, [[i, j + 1]], player, 0, 1));
 				}
 				if(j && board[i][j - 1] === !player)
 				{
-					if(a = continueSearch(board, [[i, j - 1]], player, 0, -1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i, j - 1]], player, 0, -1));
 				}
 				if(i && j && board[i - 1][j - 1] === !player)
-				{//we've already checked if this position has a piece that is opposite of the player's color, so we should keep it in array
-					if(a = continueSearch(board, [[i - 1, j - 1]], player, -1, -1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+				{
+					plotPossibility(continueSearch(board, [[i - 1, j - 1]], player, -1, -1));
 				}
 				if(i && board[i - 1][j] === !player)
 				{
-					if(a = continueSearch(board, [[i - 1, j]], player, -1, 0))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i - 1, j]], player, -1, 0));
 				}
 				if(i && bigJ && board[i - 1][j + 1] === !player)
 				{
-					if(a = continueSearch(board, [[i - 1, j + 1]], player, -1, 1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i - 1, j + 1]], player, -1, 1));
 				}
 				if(bigI && j && board[i + 1][j - 1] === !player)
 				{
-					if(a = continueSearch(board, [[i + 1, j - 1]], player, 1, -1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i + 1, j - 1]], player, 1, -1));
 				}
 				if(bigI && board[i + 1][j] === !player)
 				{
-					if(a = continueSearch(board, [[i + 1, j]], player, 1, 0))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i + 1, j]], player, 1, 0));
 				}
 				if(bigI && bigJ && board[i + 1][j + 1] === !player)
 				{
-					if(a = continueSearch(board, [[i + 1, j + 1]], player, 1, 1))
-					{
-						var ex = document.getElementById(letters[a[a.length - 1][0]] + (a[a.length - 1][1] + 1));
-						ex.className = 'possible';
-						ex.setAttribute('data-history', JSON.stringify(mergePossibilities(JSON.parse(ex.getAttribute('data-history')), a)));
-						++numMoves;
-						moves.push(a);
-					}
+					plotPossibility(continueSearch(board, [[i + 1, j + 1]], player, 1, 1));
 				}
 			}
 		}
 	}
-	//console.log(moves)
 	return numMoves;
 }
 
@@ -214,8 +164,6 @@ document.addEventListener
 	{
 		if(e.target.className === 'possible')
 		{
-			console.log(player2class(player))
-			console.log(numberOfMoves)
 			var possibilities = JSON.parse(e.target.getAttribute('data-history'));
 			e.target.removeAttribute('data-history');
 			e.target.removeAttribute('class');
@@ -229,18 +177,31 @@ document.addEventListener
 				exes[i].removeAttribute('data-history');
 				exes[i].removeAttribute('class');
 			}
-			player = !player;
-			numberOfMoves[player === true ? 1 : 0] = calculatePossibilities(player);
-			console.log(numberOfMoves[player])
-			if(numberOfMoves[player === true ? 1 : 0] === 0)
+			if(calculatePossibilities(player = !player) === 0)
 			{
-				alert('coolo');
-				player = !player;
-				numberOfMoves[player === true ? 1 : 0] = calculatePossibilities(player);
-			}
-			if(numberOfMoves[0] + numberOfMoves[1] === 0)
-			{
-				alert('game over\nblack: ' + document.getElementsByClassName('one').length + '\nwhite: ' + document.getElementsByClassName('two').length);
+				if(calculatePossibilities(player = !player) === 0)
+				{
+					alert('game over\nblack: ' + document.getElementsByClassName('one').length + '\nwhite: ' + document.getElementsByClassName('two').length);
+					if(confirm("play again?"))
+					{
+						reset();
+						if(mode)
+						{
+							//play with same person online
+							//send message to other side to reset as well
+							//wait for message
+							//both sides must have received reset call before resetting?
+						}
+						else
+						{
+							//offline
+						}
+					}
+				}
+				else
+				{
+					alert('No possible moves. Now player' + player2class(player) + "'s turn.")
+				}
 			}
 		}
 	},
@@ -248,6 +209,40 @@ document.addEventListener
 );
 
 
+function reset()
+{
+	var rows = document.getElementById('bored').rows;
+	for(var i = 0; i < rows.length; ++i)
+	{
+		for(var j = 0; j < rows[i].cells.length; ++j)
+		{
+			rows[i].cells[j].removeAttribute('data-history');
+			rows[i].cells[j].removeAttribute('class');
+		}
+	}
+	document.getElementById('C5').setAttribute('data-history', JSON.stringify([[3,4],[2,4]]));
+	document.getElementById('C5').className = 'possible';
+	document.getElementById('D4').className = 'one';
+	document.getElementById('D5').className = 'two';
+	document.getElementById('D6').setAttribute('data-history', JSON.stringify([[3,4],[3,5]]));
+	document.getElementById('D6').className = 'possible';
+	document.getElementById('E3').setAttribute('data-history', JSON.stringify([[4,3],[4,2]]));
+	document.getElementById('E3').className = 'possible';
+	document.getElementById('E5').className = 'one';
+	document.getElementById('E4').className = 'two';
+	document.getElementById('F4').setAttribute('data-history', JSON.stringify([[4,3],[5,3]]));
+	document.getElementById('F4').className = 'possible';
+}
+
+document.getElementById('local').onclick = function()
+{
+	mode = false;
+};
+
+document.getElementById('online').onclick = function()
+{
+	mode = true;
+};
 
 var channel = new DataChannel('green tea parfait');
 channel.send('pocky');

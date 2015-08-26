@@ -288,7 +288,14 @@ document.getElementById('create').onclick = function()
 				{
 					console.log(data)
 					conn = peer.connect(data);
-					conn.send('yes I know')
+					conn.on
+					(
+						'open',
+						function()
+						{
+							conn.send('yes I know');
+						}
+					);
 					//document.getElementById(data).click();
 				}
 			);

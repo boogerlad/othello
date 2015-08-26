@@ -246,10 +246,10 @@ document.getElementById('join').onclick = function()
 	var conn = peer.connect(prompt('who?'));
 	conn.on
 	(
-		'connection',
+		'open',
 		function()
 		{
-			peer.send('connected');
+			conn.send('connected');
 		}
 	);
 	peer.on

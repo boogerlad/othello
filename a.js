@@ -282,12 +282,13 @@ document.getElementById('create').onclick = function()
 		function(conne)
 		{
 			conn = conne;
-			conn.on
+			conne.on
 			(
 				'data',
 				function(data)
 				{
 					console.log(data);
+					conne.send('context')
 					//document.getElementById(data).click();
 				}
 			);

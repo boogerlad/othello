@@ -249,7 +249,7 @@ document.getElementById('join').onclick = function()
 		'open',
 		function()
 		{
-			conn.send('connected');
+			conn.send(peer.id);
 		}
 	);
 	peer.on
@@ -281,14 +281,13 @@ document.getElementById('create').onclick = function()
 		'connection',
 		function(conne)
 		{
-			conn = conne;
 			conne.on
 			(
 				'data',
 				function(data)
 				{
-					console.log(data);
-					conne.send('context')
+					conn = peer.connect(data);
+					conn.send('yes I know')
 					//document.getElementById(data).click();
 				}
 			);

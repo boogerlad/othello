@@ -1,7 +1,7 @@
 //j column
 var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
-var mode = false; //local
 var player = false;
+var mode = false;
 
 function mergePossibilities(one, two)
 {
@@ -192,10 +192,10 @@ document.addEventListener
 							//wait for message
 							//both sides must have received reset call before resetting?
 						}
-						else
-						{
-							//offline
-						}
+					}
+					else if(mode)
+					{
+						//close dataconnection
 					}
 				}
 				else
@@ -237,23 +237,59 @@ function reset()
 document.getElementById('local').onclick = function()
 {
 	mode = false;
+	reset();
 };
 
-document.getElementById('online').onclick = function()
+document.getElementById('join').onclick = function()
 {
-	mode = true;
 	var peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
-var conn = peer.connect('another-peers-id');
-conn.on('open', function(){
-  conn.send('hi!');
-});
-peer.on('connection', function(conn) {
-  conn.on('data', function(data){
-    // Will print 'hi!'
-    console.log(data);
-  });
-});
+	var conn = peer.connect(prompt('who?'));
+	conn.on
+	(
+		'connection',
+		function()
+		{
+			peer.send('connected');
+		}
+	);
+	peer.on
+	(
+		'connection',
+		function(conn)
+		{
+			conn.on
+			(
+				'data',
+				function(data)
+				{
+					console.log(data);
+					//document.getElementById(data).click();
+				}
+			);
+		}
+	);
 	//if exist and is one person, join
 	//if exists and is two person, err(choose another name, this is already taken)
 	//if does not exist then create
 };
+
+document.getElementById('create').onclick = function()
+{
+	var peer = new Peer(prompt('send this name to your opponent so they can join', {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	peer.on
+	(
+		'connection',
+		function(conn)
+		{
+			conn.on
+			(
+				'data',
+				function(data)
+				{
+					console.log(data);
+					//document.getElementById(data).click();
+				}
+			);
+		}
+	);
+}

@@ -281,11 +281,13 @@ document.getElementById('create').onclick = function()
 		'connection',
 		function(conne)
 		{
+			console.log(conne)
 			conne.on
 			(
 				'data',
 				function(data)
 				{
+					console.log(data)
 					conn = peer.connect(data)
 					//console.log(data);
 					//document.getElementById(data).click();

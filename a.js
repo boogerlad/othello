@@ -286,6 +286,7 @@ document.getElementById('create').onclick = function()
 				'data',
 				function(data)
 				{
+					console.log(data)
 					conn = peer.connect(data);
 					conn.send('yes I know')
 					//document.getElementById(data).click();

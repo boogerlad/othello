@@ -249,6 +249,7 @@ document.getElementById('join').onclick = function()
 		'open',
 		function(id)
 		{
+			console.log(id)
 			conn.send(id);
 		}
 	);

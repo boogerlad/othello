@@ -247,9 +247,9 @@ document.getElementById('join').onclick = function()
 	conn.on
 	(
 		'open',
-		function()
+		function(id)
 		{
-			conn.send('connected');
+			conn.send(id);
 		}
 	);
 	peer.on
@@ -281,13 +281,13 @@ document.getElementById('create').onclick = function()
 		'connection',
 		function(conne)
 		{
-			conn = conne;
-			conn.on
+			conne.on
 			(
 				'data',
 				function(data)
 				{
-					console.log(data);
+					conn = peer.connect(data)
+					//console.log(data);
 					//document.getElementById(data).click();
 				}
 			);

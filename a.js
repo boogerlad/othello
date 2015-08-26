@@ -279,8 +279,9 @@ document.getElementById('create').onclick = function()
 	peer.on
 	(
 		'connection',
-		function(conn)
+		function(conne)
 		{
+			conn = conne;
 			conn.on
 			(
 				'data',

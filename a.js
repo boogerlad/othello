@@ -242,7 +242,7 @@ document.getElementById('local').onclick = function()
 
 document.getElementById('join').onclick = function()
 {
-	peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d', config: {'iceServers': [{url: 'stun:stun.l.google.com:19302'}]}});
 	conn = peer.connect(prompt('who?'));
 	conn.on
 	(
@@ -275,7 +275,7 @@ document.getElementById('join').onclick = function()
 
 document.getElementById('create').onclick = function()
 {
-	peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d', config: {'iceServers': [{url: 'stun:stun.l.google.com:19302'}]}});
 	peer.on
 	(
 		'connection',

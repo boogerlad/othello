@@ -2,7 +2,7 @@
 var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
 var player = false;
 var mode = false;
-
+var peer, conn;
 function mergePossibilities(one, two)
 {
 	if(one === null || typeof one === 'undefined')
@@ -242,8 +242,8 @@ document.getElementById('local').onclick = function()
 
 document.getElementById('join').onclick = function()
 {
-	var peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
-	var conn = peer.connect(prompt('who?'));
+	peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	conn = peer.connect(prompt('who?'));
 	conn.on
 	(
 		'open',
@@ -275,7 +275,7 @@ document.getElementById('join').onclick = function()
 
 document.getElementById('create').onclick = function()
 {
-	var peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
 	peer.on
 	(
 		'connection',

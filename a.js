@@ -275,7 +275,7 @@ document.getElementById('join').onclick = function()
 
 document.getElementById('create').onclick = function()
 {
-	var peer = new Peer(prompt('send this name to your opponent so they can join', {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+	var peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
 	peer.on
 	(
 		'connection',

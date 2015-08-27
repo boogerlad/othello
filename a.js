@@ -2,7 +2,7 @@
 var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
 var player = false;
 var mode = false;
-var peer, conn;
+
 function mergePossibilities(one, two)
 {
 	if(one === null || typeof one === 'undefined')
@@ -203,6 +203,10 @@ document.addEventListener
 					alert('No possible moves. Now player' + player2class(player) + "'s turn.")
 				}
 			}
+			else if(mode)
+			{
+				//send message
+			}
 		}
 	},
 	false
@@ -239,66 +243,100 @@ document.getElementById('local').onclick = function()
 	mode = false;
 	reset();
 };
+var activedc;
+var cfg = {"iceServers":[{"url":"stun:23.21.150.121"}]};
+var con = { 'optional': [{'DtlsSrtpKeyAgreement': true}] };
+var pc1 = new RTCPeerConnection(cfg, con);
+var dc1 = null;
+var noop = function(){};
+
+pc1.onicecandidate = function(e)
+{
+	if(e.candidate === null)
+	{
+		prompt('send this to your opponent', JSON.stringify(pc1.localDescription));
+		pc1.setRemoteDescription(new RTCSessionDescription(JSON.parse(prompt('paste your opponent\'s answer'))), noop, noop);
+
+	}
+};
+
+var pc2 = new RTCPeerConnection(cfg, con);
+var dc2 = null;
+pc2.ondatachannel = function(e)
+{
+	var datachannel = e.channel || e; // Chrome sends event, FF sends raw channel
+	console.log("Received datachannel (pc2)", arguments);
+	dc2 = datachannel;
+	dc2.onopen = function(e)
+	{
+		console.log('data channel connect');
+	}
+	dc2.onmessage = function(e)
+	{
+		console.log("Got message (pc2)", e.data);
+	};
+};
+
+pc2.onicecandidate = function(e)
+{
+	if(e.candidate === null)
+	{
+		prompt('send this back to your opponent', JSON.stringify(pc2.localDescription));
+	}
+};
 
 document.getElementById('join').onclick = function()
 {
-	peer = new Peer({key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d', config: {'iceServers': [{url: 'stun:stun.l.google.com:19302'}]}});
-	conn = peer.connect(prompt('who?'));
-	conn.on
+	pc2.setRemoteDescription(new RTCSessionDescription(JSON.parse(prompt('paste your opponent\'s offer'))), noop, noop);
+	pc2.createAnswer
 	(
-		'open',
+		function(answerDesc)
+		{
+			console.log("Created local answer: ", answerDesc);
+			pc2.setLocalDescription(answerDesc, noop, noop);
+		},
 		function()
 		{
-			conn.send(peer.id);
+			console.warn("No create answer");
 		}
 	);
-	peer.on
-	(
-		'connection',
-		function(conn)
-		{
-			conn.on
-			(
-				'data',
-				function(data)
-				{
-					console.log(data);
-					//document.getElementById(data).click();
-				}
-			);
-		}
-	);
-	//if exist and is one person, join
-	//if exists and is two person, err(choose another name, this is already taken)
-	//if does not exist then create
+	//player = false;
+	activedc = dc2;
 };
 
 document.getElementById('create').onclick = function()
 {
-	peer = new Peer(prompt('type a unique identifier and send it to your opponent so they can join'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d', config: {'iceServers': [{url: 'stun:stun.l.google.com:19302'}]}});
-	peer.on
-	(
-		'connection',
-		function(conne)
+	//player = true;
+	try
+	{
+		dc1 = pc1.createDataChannel('test', {reliable:true});
+		dc1.onopen = function(e)
 		{
-			conne.on
-			(
-				'data',
-				function(data)
-				{
-					console.log(data)
-					conn = peer.connect(data);
-					conn.on
-					(
-						'open',
-						function()
-						{
-							conn.send('yes I know');
-						}
-					);
-					//document.getElementById(data).click();
-				}
-			);
+			console.log('data channel connect');
+		}
+		dc1.onmessage = function(e)
+		{
+			console.log("Got message (pc1)", e.data);	
+		};
+	}
+	catch(e)
+	{
+		console.warn("No data channel (pc1)", e);
+	}
+	pc1.createOffer
+	(
+		function(desc)
+		{
+			pc1.setLocalDescription(desc, noop, noop);
+			console.log("created local offer", desc);
+		},
+		function()
+		{
+			console.warn("Couldn't create offer");
 		}
 	);
+	activedc = dc1;
 }
+
+
+//activedc.send('txt')

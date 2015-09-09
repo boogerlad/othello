@@ -348,7 +348,6 @@ document.getElementById('create').onclick = function()
 				function(e)
 				{
 					ok = false;
-					alert('fuk')
 				}
 			);
 		}

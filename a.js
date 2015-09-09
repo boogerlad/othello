@@ -247,17 +247,43 @@ document.getElementById('local').onclick = function()
 	reset();
 	opponents.className = 'hidden';
 	document.getElementById('join').className = 'hidden';
+	document.getElementById('camera').className = 'hidden';
 	window.clearInterval(interval);
+	peer.destroy();
+	conn = null;
+	call = null;
 };
 
 var peer = null;
 var conn;
+var call;
+var ok = null;
+var front = true;
+document.getElementById('camera').onclick = function()
+{
+	front = !front;
+	if(front === false)
+	{
+		this.innerHTML = 'Back Camera';
+	}
+	else
+	{
+		this.innerHTML = 'Front Camera';
+	}
+};
+
+var constraints = 
+{
+	audio: true,
+	video:
+	{
+		facingMode: (front? "user" : "environment")
+	}
+};
 
 function cool(conn)
 {
-	console.log(window.conn);
 	window.conn = conn;
-	console.log(window.conn);
 	conn.on
 	(
 		'open',
@@ -272,17 +298,19 @@ function cool(conn)
 				}
 			);
 			window.clearInterval(interval);
-			peer.disconnect();
+			if(ok != null)//if ok is null, that means we're still waiting
+			{
+				peer.disconnect();
+			}
 			opponents.className = 'hidden';
 			document.getElementById('join').className = 'hidden';
-			//video call??
+			document.getElementById('camera').className = 'hidden';
 		}
 	);
 }
 
 document.getElementById('create').onclick = function()
 {
-	//cool(peer.connect(prompt('paste your opponent\'s id')));
 	if(peer === null)
 	{
 		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
@@ -290,15 +318,77 @@ document.getElementById('create').onclick = function()
 	else
 	{
 		peer.destroy();
+		conn = null;
+		call = null;
 		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'})
 	}
 	interval = window.setInterval(populateOpponents, 1000);
 	peer.on('connection', cool);
+	peer.on
+	(
+		'call',
+		function(call)
+		{
+			var promise = navigator.mediaDevices.getUserMedia(constraints);
+			promise.then
+			(
+				function(mediaStream)
+				{
+					call.answer(mediaStream);
+					if(!peer.disconnected)
+					{
+						peer.disconnect();
+					}
+				}
+			);
+		}
+	);
+	peer.on
+	(
+		'error',
+		function(err)
+		{
+			switch(err.type)
+			{
+				case 'browser-incompatible':
+				{
+					alert('Can only play locally. This browser doesn\'t support WebRTC. Install bowser if on ios.');
+					break;
+				}
+				case 'unavailable-id':
+				case 'invalid-id':
+				{
+					peer.destroy();
+					conn = null;
+					call = null;
+					alert('invalid characters for id used or id is already taken');
+					peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'})
+				}
+			}
+		}
+	);
 	document.getElementById('join').className = '';
+	document.getElementById('camera').className = '';
 }
 
 document.getElementById('join').onclick = function()
 {
+	var promise = navigator.mediaDevices.getUserMedia(constraints);
+	promise.then
+	(
+		function(mediaStream)
+		{
+			peer.call(opponents.options[opponents.selectedIndex].text, mediaStream);
+			ok = true;
+		}
+	);
+	promise.catch
+	(
+		function(e)
+		{
+			ok = false;
+		}
+	);
 	cool(peer.connect(opponents.options[opponents.selectedIndex].text));
 }
 

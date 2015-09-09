@@ -322,11 +322,12 @@ function cool(conn)
 			if(ok != null)//if ok is null, that means we're still waiting
 			{
 				//peer.disconnect();
-				alert('true or forth')
+				//alert('true or forth')
 			}
 			else
 			{
-				alert('fuk')
+				//now we know this happens...... fuck
+				//alert('fuk')
 			}
 			opponents.className = 'hidden';
 			document.getElementById('join').className = 'hidden';
@@ -363,7 +364,7 @@ document.getElementById('create').onclick = function()
 				{
 					call.answer(mediaStream);
 					ok = true;
-					alert(peer.disconnected);
+					//alert(peer.disconnected);
 					if(!peer.disconnected)
 					{
 						//peer.disconnect();

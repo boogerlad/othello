@@ -300,7 +300,7 @@ function cool(conn)
 			window.clearInterval(interval);
 			if(ok != null)//if ok is null, that means we're still waiting
 			{
-				peer.disconnect();
+				//peer.disconnect();
 			}
 			opponents.className = 'hidden';
 			document.getElementById('join').className = 'hidden';
@@ -338,7 +338,7 @@ document.getElementById('create').onclick = function()
 					ok = true;
 					if(!peer.disconnected)
 					{
-						peer.disconnect();
+						//peer.disconnect();
 					}
 					call.on('stream', addStream);
 				}
@@ -348,6 +348,7 @@ document.getElementById('create').onclick = function()
 				function(e)
 				{
 					ok = false;
+					alert('fuk')
 				}
 			);
 		}
@@ -396,6 +397,7 @@ document.getElementById('join').onclick = function()
 		function(e)
 		{
 			ok = false;
+			alert('fuk')
 		}
 	);
 	cool(peer.connect(opponents.options[opponents.selectedIndex].text));

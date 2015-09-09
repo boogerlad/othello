@@ -300,7 +300,7 @@ function cool(conn)
 			window.clearInterval(interval);
 			if(ok != null)//if ok is null, that means we're still waiting
 			{
-				//peer.disconnect();
+				peer.disconnect();
 			}
 			opponents.className = 'hidden';
 			document.getElementById('join').className = 'hidden';
@@ -338,7 +338,7 @@ document.getElementById('create').onclick = function()
 					ok = true;
 					if(!peer.disconnected)
 					{
-						//peer.disconnect();
+						peer.disconnect();
 					}
 					call.on('stream', addStream);
 				}
@@ -397,7 +397,6 @@ document.getElementById('join').onclick = function()
 		function(e)
 		{
 			ok = false;
-			alert('fuk')
 		}
 	);
 	cool(peer.connect(opponents.options[opponents.selectedIndex].text));
@@ -405,8 +404,12 @@ document.getElementById('join').onclick = function()
 
 function addStream(stream)
 {
-	document.getElementById('u').src = window.URL.createObjectURL(stream);
-
+	var video = document.getElementById('u');
+	video.src = window.URL.createObjectURL(stream);
+	video.onloadedmetadata = function(e)
+	{
+		video.play();
+	}
 }
 
 function populateOpponents()

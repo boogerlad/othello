@@ -294,6 +294,7 @@ document.getElementById('create').onclick = function()
 	}
 	interval = window.setInterval(populateOpponents, 1000);
 	peer.on('connection', cool);
+	document.getElementById('join').className = '';
 }
 
 document.getElementById('join').onclick = function()
@@ -314,10 +315,13 @@ function populateOpponents()
 			}
 			for(var i = 0; i < list.length; ++i)
 			{
-				var opt = document.createElement('option');
-				opt.value = i;
-				opt.innerHTML = list[i];
-				opponents.appendChild(opt);
+				if(list[i] !== peer.id)
+				{
+					var opt = document.createElement('option');
+					opt.value = i;
+					opt.innerHTML = list[i];
+					opponents.appendChild(opt);
+				}
 			}
 		}
 	);

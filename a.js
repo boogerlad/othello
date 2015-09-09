@@ -321,7 +321,12 @@ function cool(conn)
 			window.clearInterval(interval);
 			if(ok != null)//if ok is null, that means we're still waiting
 			{
-				peer.disconnect();
+				//peer.disconnect();
+				alert('true or forth')
+			}
+			else
+			{
+				alert('fuk')
 			}
 			opponents.className = 'hidden';
 			document.getElementById('join').className = 'hidden';
@@ -358,9 +363,10 @@ document.getElementById('create').onclick = function()
 				{
 					call.answer(mediaStream);
 					ok = true;
+					alert(peer.disconnected);
 					if(!peer.disconnected)
 					{
-						peer.disconnect();
+						//peer.disconnect();
 					}
 					call.on('stream', addStream);
 				}

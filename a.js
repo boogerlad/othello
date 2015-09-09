@@ -299,7 +299,7 @@ document.getElementById('create').onclick = function()
 
 document.getElementById('join').onclick = function()
 {
-	cool(peer.connect(opponents.options[opponents.opponentsedIndex].text));
+	cool(peer.connect(opponents.options[opponents.selectedIndex].text));
 }
 
 function populateOpponents()

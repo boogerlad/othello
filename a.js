@@ -298,7 +298,7 @@ document.getElementById('create').onclick = function()
 
 document.getElementById('join').onclick = function()
 {
-	cool(peer.connect(select.options[select.selectedIndex].text));
+	cool(peer.connect(opponents.options[opponents.opponentsedIndex].text));
 }
 
 function populateOpponents()
@@ -308,16 +308,16 @@ function populateOpponents()
 		function(list)
 		{
 			opponents.className = '';
-			while(select.firstChild)
+			while(opponents.firstChild)
 			{
-				select.removeChild(select.firstChild);
+				opponents.removeChild(opponents.firstChild);
 			}
 			for(var i = 0; i < list.length; ++i)
 			{
 				var opt = document.createElement('option');
 				opt.value = i;
 				opt.innerHTML = list[i];
-				select.appendChild(opt);
+				opponents.appendChild(opt);
 			}
 		}
 	);

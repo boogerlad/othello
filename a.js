@@ -157,13 +157,14 @@ function player2class(player)
 
 var player = false;
 var mode = false;
-var me = true;;
+var me = true;
+remote = false;
 document.addEventListener
 (
 	'click',
 	function(e)
 	{
-		if(e.target.className === 'possible' && me)
+		if(e.target.className === 'possible' && me || remote)
 		{
 			var possibilities = JSON.parse(e.target.getAttribute('data-history'));
 			e.target.removeAttribute('data-history');
@@ -185,18 +186,22 @@ document.addEventListener
 					alert('game over\nblack: ' + document.getElementsByClassName('one').length + '\nwhite: ' + document.getElementsByClassName('two').length);
 					if(confirm("play again?"))
 					{
-						reset();
 						if(mode)
 						{
-							//play with same person online
-							//send message to other side to reset as well
-							//wait for message
-							//both sides must have received reset call before resetting?
+							conn.send('reset');
+						}
+						else
+						{
+							reset();
 						}
 					}
 					else if(mode)
 					{
-						//close dataconnection
+						call.close();
+						conn.close();
+						peer = new Peer(peer.id, {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
+						//do more stuff
+						//perhaps move to a function?
 					}
 				}
 				else
@@ -206,8 +211,16 @@ document.addEventListener
 			}
 			else if(mode)
 			{
-				me = false;
-				//send message
+				if(!remote)
+				{
+					me = false;
+					conn.send(e.target.id);
+				}
+				else
+				{
+					remote = false;
+					me = true;
+				}
 			}
 		}
 	},
@@ -294,7 +307,15 @@ function cool(conn)
 				'data',
 				function(data)
 				{
-					//interpret
+					if(data === 'reset')
+					{
+						reset();
+					}
+					else
+					{
+						remote = true;
+						document.getElementById(data).click();
+					}
 				}
 			);
 			window.clearInterval(interval);
@@ -320,7 +341,7 @@ document.getElementById('create').onclick = function()
 		peer.destroy();
 		conn = null;
 		call = null;
-		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'})
+		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
 	}
 	interval = window.setInterval(populateOpponents, 1000);
 	peer.on('connection', cool);
@@ -382,6 +403,7 @@ document.getElementById('create').onclick = function()
 
 document.getElementById('join').onclick = function()
 {
+	me = false;
 	var promise = navigator.mediaDevices.getUserMedia(constraints);
 	promise.then
 	(
@@ -421,6 +443,7 @@ function populateOpponents()
 			while(opponents.firstChild)
 			{
 				opponents.removeChild(opponents.firstChild);
+				//need to fix
 			}
 			for(var i = 0; i < list.length; ++i)
 			{

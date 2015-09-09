@@ -1,8 +1,3 @@
-//j column
-var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row
-var player = false;
-var mode = false;
-
 function mergePossibilities(one, two)
 {
 	if(one === null || typeof one === 'undefined')
@@ -62,6 +57,8 @@ function htmlToArray()
 	}
 	return boardArray;
 }
+
+var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];//i row, j column
 
 function calculatePossibilities(player)
 {
@@ -157,12 +154,16 @@ function player2class(player)
 	}
 }
 
+
+var player = false;
+var mode = false;
+var me = true;;
 document.addEventListener
 (
 	'click',
 	function(e)
 	{
-		if(e.target.className === 'possible')
+		if(e.target.className === 'possible' && me)
 		{
 			var possibilities = JSON.parse(e.target.getAttribute('data-history'));
 			e.target.removeAttribute('data-history');
@@ -205,6 +206,7 @@ document.addEventListener
 			}
 			else if(mode)
 			{
+				me = false;
 				//send message
 			}
 		}
@@ -237,106 +239,86 @@ function reset()
 	document.getElementById('F4').setAttribute('data-history', JSON.stringify([[4,3],[5,3]]));
 	document.getElementById('F4').className = 'possible';
 }
-
+var opponents = document.getElementById('opponents');
+var interval;
 document.getElementById('local').onclick = function()
 {
 	mode = false;
 	reset();
-};
-var activedc;
-var cfg = {"iceServers":[{"url":"stun:23.21.150.121"}]};
-var con = { 'optional': [{'DtlsSrtpKeyAgreement': true}] };
-var pc1 = new RTCPeerConnection(cfg, con);
-var dc1 = null;
-var noop = function(){};
-
-pc1.onicecandidate = function(e)
-{
-	if(e.candidate === null)
-	{
-		prompt('send this to your opponent', JSON.stringify(pc1.localDescription));
-		pc1.setRemoteDescription(new RTCSessionDescription(JSON.parse(prompt('paste your opponent\'s answer'))), noop, noop);
-
-	}
+	opponents.className = 'hidden';
+	document.getElementById('join').className = 'hidden';
+	window.clearInterval(interval);
 };
 
-var pc2 = new RTCPeerConnection(cfg, con);
-var dc2 = null;
-pc2.ondatachannel = function(e)
-{
-	var datachannel = e.channel || e; // Chrome sends event, FF sends raw channel
-	console.log("Received datachannel (pc2)", arguments);
-	dc2 = datachannel;
-	dc2.onopen = function(e)
-	{
-		console.log('data channel connect');
-	}
-	dc2.onmessage = function(e)
-	{
-		console.log("Got message (pc2)", e.data);
-	};
-};
+var peer = null;
+var conn;
 
-pc2.onicecandidate = function(e)
+function cool(conn)
 {
-	if(e.candidate === null)
-	{
-		prompt('send this back to your opponent', JSON.stringify(pc2.localDescription));
-	}
-};
-
-document.getElementById('join').onclick = function()
-{
-	pc2.setRemoteDescription(new RTCSessionDescription(JSON.parse(prompt('paste your opponent\'s offer'))), noop, noop);
-	pc2.createAnswer
+	console.log(window.conn);
+	window.conn = conn;
+	console.log(window.conn);
+	conn.on
 	(
-		function(answerDesc)
-		{
-			console.log("Created local answer: ", answerDesc);
-			pc2.setLocalDescription(answerDesc, noop, noop);
-		},
+		'open',
 		function()
 		{
-			console.warn("No create answer");
+			conn.on
+			(
+				'data',
+				function(data)
+				{
+					//interpret
+				}
+			);
 		}
+		window.clearInterval(interval);
+		peer.disconnect();
+		opponents.className = 'hidden';
+		document.getElementById('join').className = 'hidden';
+		//video call??
 	);
-	//player = false;
-	activedc = dc2;
-};
+}
 
 document.getElementById('create').onclick = function()
 {
-	//player = true;
-	try
+	//cool(peer.connect(prompt('paste your opponent\'s id')));
+	if(peer === null)
 	{
-		dc1 = pc1.createDataChannel('test', {reliable:true});
-		dc1.onopen = function(e)
-		{
-			console.log('data channel connect');
-		}
-		dc1.onmessage = function(e)
-		{
-			console.log("Got message (pc1)", e.data);	
-		};
+		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});
 	}
-	catch(e)
+	else
 	{
-		console.warn("No data channel (pc1)", e);
+		peer.destroy();
+		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'})
 	}
-	pc1.createOffer
-	(
-		function(desc)
-		{
-			pc1.setLocalDescription(desc, noop, noop);
-			console.log("created local offer", desc);
-		},
-		function()
-		{
-			console.warn("Couldn't create offer");
-		}
-	);
-	activedc = dc1;
+	interval = window.setInterval(populateOpponents, 1000);
+	peer.on('connection', cool);
 }
 
+document.getElementById('join').onclick = function()
+{
+	cool(peer.connect(select.options[select.selectedIndex].text));
+}
 
-//activedc.send('txt')
+function populateOpponents()
+{
+	peer.listAllPeers
+	(
+		function(list)
+		{
+			opponents.className = '';
+			while(select.firstChild)
+			{
+				select.removeChild(select.firstChild);
+			}
+			for(var i = 0; i < list.length; ++i)
+			{
+				var opt = document.createElement('option');
+				opt.value = i;
+				opt.innerHTML = list[i];
+				select.appendChild(opt);
+			}
+		}
+	);
+}

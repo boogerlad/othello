@@ -94,9 +94,12 @@
 		</table>
 		<label><input type="checkbox" id="visibleMoves" checked>Show possible moves</label>
 		<button id="local" type="button">New local game</button>
-		<button id="join" type="button">Join online game</button>
-		<button id="create" type="button">Create online game</button>
-		<script src="//rawgit.com/cjb/serverless-webrtc/master/js/adapter.js"></script>
+		<button id="create" type="button">Join online game</button>
+		<select id="opponents" class="hidden"></select>
+		<button id="join" class="hidden">Connect to this opponent</button>
+		<video id="u"></video>
+		<script src="https://skyway.io/dist/0.3/peer.min.js"></script>
+		<script src="https://rawgit.com/webrtc/adapter/master/adapter.js"></script>
 		<script src="a.js"></script>
 	</body>
 </html>

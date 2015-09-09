@@ -332,6 +332,7 @@ function cool(conn)
 
 document.getElementById('create').onclick = function()
 {
+	mode = true
 	if(peer === null)
 	{
 		peer = new Peer(prompt('enter an id in the form of "unique name - preferred skill level" so that an opponent can find you'), {key: 'ed88f955-5b7c-448d-bf99-086cd4b7806d'});

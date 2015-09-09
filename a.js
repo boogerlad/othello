@@ -340,6 +340,7 @@ document.getElementById('create').onclick = function()
 					{
 						peer.disconnect();
 					}
+					call.on('stream', addStream);
 				}
 			);
 			promise.catch
@@ -386,7 +387,7 @@ document.getElementById('join').onclick = function()
 	(
 		function(mediaStream)
 		{
-			peer.call(opponents.options[opponents.selectedIndex].text, mediaStream);
+			peer.call(opponents.options[opponents.selectedIndex].text, mediaStream).on('stream', addStream);
 			ok = true;
 		}
 	);
@@ -398,6 +399,12 @@ document.getElementById('join').onclick = function()
 		}
 	);
 	cool(peer.connect(opponents.options[opponents.selectedIndex].text));
+}
+
+function addStream(stream)
+{
+	document.getElementById('u').src = window.URL.createObjectUrl(stream);
+
 }
 
 function populateOpponents()

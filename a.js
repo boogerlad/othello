@@ -405,7 +405,7 @@ document.getElementById('join').onclick = function()
 
 function addStream(stream)
 {
-	document.getElementById('u').src = window.URL.createObjectUrl(stream);
+	document.getElementById('u').src = window.URL.createObjectURL(stream);
 
 }
 

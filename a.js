@@ -335,10 +335,18 @@ document.getElementById('create').onclick = function()
 				function(mediaStream)
 				{
 					call.answer(mediaStream);
+					ok = true;
 					if(!peer.disconnected)
 					{
 						peer.disconnect();
 					}
+				}
+			);
+			promise.catch
+			(
+				function(e)
+				{
+					ok = false;
 				}
 			);
 		}

@@ -271,12 +271,12 @@ function cool(conn)
 					//interpret
 				}
 			);
+			window.clearInterval(interval);
+			peer.disconnect();
+			opponents.className = 'hidden';
+			document.getElementById('join').className = 'hidden';
+			//video call??
 		}
-		window.clearInterval(interval);
-		peer.disconnect();
-		opponents.className = 'hidden';
-		document.getElementById('join').className = 'hidden';
-		//video call??
 	);
 }
 

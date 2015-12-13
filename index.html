@@ -8,99 +8,22 @@
 		<link rel="stylesheet" href="a.css">
 	</head>
 	<body bgcolor="#E6E6FA">
-		<table id="bored" cellpadding="0" cellspacing="0">
-			<tbody>
-				<tr>
-					<td id="A1"></td>
-					<td id="A2"></td>
-					<td id="A3"></td>
-					<td id="A4"></td>
-					<td id="A5"></td>
-					<td id="A6"></td>
-					<td id="A7"></td>
-					<td id="A8"></td>
-				</tr>
-				<tr>
-					<td id="B1"></td>
-					<td id="B2"></td>
-					<td id="B3"></td>
-					<td id="B4"></td>
-					<td id="B5"></td>
-					<td id="B6"></td>
-					<td id="B7"></td>
-					<td id="B8"></td>
-				</tr>
-				<tr>
-					<td id="C1"></td>
-					<td id="C2"></td>
-					<td id="C3"></td>
-					<td id="C4"></td>
-					<td data-history="[[3,4],[2,4]]" class="possible" id="C5"></td>
-					<td id="C6"></td>
-					<td id="C7"></td>
-					<td id="C8"></td>
-				</tr>
-				<tr>
-					<td id="D1"></td>
-					<td id="D2"></td>
-					<td id="D3"></td>
-					<td id="D4" class="one"></td>
-					<td id="D5" class="two"></td>
-					<td data-history="[[3,4],[3,5]]" class="possible" id="D6"></td>
-					<td id="D7"></td>
-					<td id="D8"></td>
-				</tr>
-				<tr>
-					<td id="E1"></td>
-					<td id="E2"></td>
-					<td data-history="[[4,3],[4,2]]" class="possible" id="E3"></td>
-					<td id="E4" class="two"></td>
-					<td id="E5" class="one"></td>
-					<td id="E6"></td>
-					<td id="E7"></td>
-					<td id="E8"></td>
-				</tr>
-				<tr>
-					<td id="F1"></td>
-					<td id="F2"></td>
-					<td id="F3"></td>
-					<td data-history="[[4,3],[5,3]]" class="possible" id="F4"></td>
-					<td id="F5"></td>
-					<td id="F6"></td>
-					<td id="F7"></td>
-					<td id="F8"></td>
-				</tr>
-				<tr>
-					<td id="G1"></td>
-					<td id="G2"></td>
-					<td id="G3"></td>
-					<td id="G4"></td>
-					<td id="G5"></td>
-					<td id="G6"></td>
-					<td id="G7"></td>
-					<td id="G8"></td>
-				</tr>
-				<tr>
-					<td id="H1"></td>
-					<td id="H2"></td>
-					<td id="H3"></td>
-					<td id="H4"></td>
-					<td id="H5"></td>
-					<td id="H6"></td>
-					<td id="H7"></td>
-					<td id="H8"></td>
+		<table cellpadding="0" cellspacing="0">
+			<tbody id="bored">
+				<tr v-for="row in board">
+					<td @click="play($parent.$index, $index, column)" v-for="column in row" track-by="$index" :class="{'one': column === true, 'two': column === false, 'possible': visibleMoves && column !== null && typeof column === 'object'}"></td>
 				</tr>
 			</tbody>
 		</table>
-		<label><input type="checkbox" id="visibleMoves" checked>Show possible moves</label>
-		<button id="local" type="button">New local game</button>
+		<pre>{{ $data | json }}</pre>
+		<label><input type="checkbox" id="visibleMoves" v-model="visibleMoves">Show possible moves</label>
+		<button @click="init()" id="local" type="button">New local game</button>
 		<button id="create" type="button">Join online game</button>
 		<button id="camera" class="hidden" type="button">Front camera</button>
 		<select id="opponents" class="hidden"></select>
 		<button id="join" class="hidden">Connect to this opponent</button>
 		<video id="u"></video>
-		<script src="https://skyway.io/dist/0.3/peer.min.js"></script>
-		<script src="https://rawgit.com/webrtc/adapter/master/adapter.js"></script>
-		<script src="a.js"></script>
+		<script src="vue.js"></script>
+		<script src="b.js"></script>
 	</body>
 </html>
